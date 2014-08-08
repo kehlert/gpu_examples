@@ -1,19 +1,28 @@
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <gpu_examples/histogram/raw_data_generator.hpp>
+
+using namespace ::testing;
+
+MATCHER_P2(isBetween, a, b, std::string(negation ? "isn't" : "is") + " between "
+            + PrintToString(a) + " and " + PrintToString(b)) {return a <= arg && arg <= b;}
 
 TEST(RawDataGeneratorTest, CorrectDataSize) {
     RawDataGenerator gen(0, 10);
     size_t dataSize = 5;
     const std::vector<int> data = gen.generate(dataSize);
-    EXPECT_EQ(dataSize, data.size());
+    ASSERT_EQ(dataSize, data.size());
 }
 
 TEST(RawDataGeneratorDeathTest, badLimits) {
-    EXPECT_DEATH(RawDataGenerator gen(1, 0), "<");
+    ASSERT_DEATH(RawDataGenerator gen(1, 0), "<");
 }
 
-//test that lowerLimit is < upperLimit
-
-//test the upper and lower data limits (make sure data is at least in between)
-
-//test that data contains at least two different values
+TEST(RawDataGeneratorTest, WithinLimits) {
+    RawDataGenerator gen(0, 1);
+    size_t dataSize = 5;
+    const std::vector<int> data = gen.generate(dataSize);
+    for(const int num : data) {
+        ASSERT_THAT(num, isBetween(0, 1)); 
+    }
+}
