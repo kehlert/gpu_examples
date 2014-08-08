@@ -16,4 +16,4 @@ cd ..
 gmockDir="./dependencies/gmock-1.7.0"
 gmockInclude="${gmockDir}/include/gmock/gmock.h"
 gtestInclude="${gmockDir}/gtest/include/gtest/gtest.h"
-ctags -R --c++-kinds=+p --fields=+liaS --extra=+q $gmockInclude $gtestInclude ./include/gpu_examples/*.hpp
+ctags -R --c++-kinds=+p --fields=+liaS --extra=+q $gmockInclude $gtestInclude ./include/gpu_examples/
