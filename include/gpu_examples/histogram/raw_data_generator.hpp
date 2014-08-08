@@ -8,9 +8,9 @@ class RawDataGenerator {
 public:
     RawDataGenerator(int lowerBound, int upperBound);
 
-    ~RawDataGenerator();
+    virtual ~RawDataGenerator();
 
-    std::vector<int> generate(const size_t dataSize);
+    virtual std::vector<int> generate(const size_t dataSize);
 
 private:
     const size_t SEED = 0;

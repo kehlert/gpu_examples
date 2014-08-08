@@ -1,4 +1,3 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <gpu_examples/histogram/raw_data_generator.hpp>
 
