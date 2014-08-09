@@ -1,4 +1,4 @@
 build/
 /tags
-/*.pyc
+*.pyc
 *.swp
