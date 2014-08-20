@@ -21,7 +21,7 @@ TEST(RawDataGeneratorTest, WithinLimits) {
     RawDataGenerator gen(0, 1);
     size_t dataSize = 5;
     const std::vector<int> data = gen.generate(dataSize);
-    for(const int num : data) {
+    for (const int num : data) {
         ASSERT_THAT(num, isBetween(0, 1)); 
     }
 }

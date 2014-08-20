@@ -12,7 +12,7 @@ RawDataGenerator::~RawDataGenerator() {}
 
 std::vector<int> RawDataGenerator::generate(const size_t dataSize) {
     std::vector<int> data(dataSize);
-    for(size_t i = 0; i < dataSize; ++i) {
+    for (size_t i = 0; i < dataSize; ++i) {
         data[i] = dist(engine);
     }
     return data;
