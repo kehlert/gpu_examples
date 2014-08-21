@@ -5,7 +5,7 @@ CPUHistGenerator::CPUHistGenerator(int lowerBound_,
                                    const std::vector<int>&& data_)
 : lowerBound(lowerBound_),
   upperBound(upperBound_),
-  data(data_) {}
+  data(std::move(data_)) {}
 
 CPUHistGenerator::~CPUHistGenerator() {}
 
