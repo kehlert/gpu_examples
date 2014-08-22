@@ -2,23 +2,23 @@
 
 #include <gmock/gmock.h>
 
-#include <gpu_examples/histogram/cpu_hist_generator.hpp> 
+#include <gpu_examples/histogram/gpu_hist_generator.hpp> 
 #include <gpu_examples/histogram/test_data_reader.hpp>
 #include <gpu_examples/histogram/raw_data_generator.hpp> 
 
-TEST(CPUHistGeneratorTest, CorrectOutput) {
+TEST(GPUHistGeneratorTest, CorrectOutput) {
     std::map<int, unsigned int> expectedFrequencies;
     expectedFrequencies = TestDataReader::readFrequencies("./data/testFrequencies.txt");
-    
+
     std::vector<int> rawData = TestDataReader::readRawData("./data/testData.txt");
 
-    auto frequencies = CPUHistGenerator::generate(expectedFrequencies.begin()->first,
+    auto frequencies = GPUHistGenerator::generate(expectedFrequencies.begin()->first,
                                                   expectedFrequencies.rbegin()->first,
                                                   std::move(rawData));
     ASSERT_EQ(expectedFrequencies, frequencies);
 }
-
-TEST(CPUHistGeneratorTest, Speed) {
+/*
+TEST(GPUHistGeneratorTest, Speed) {
     using namespace std::chrono;
 
     const int LOWER_BOUND = -50;
@@ -30,11 +30,11 @@ TEST(CPUHistGeneratorTest, Speed) {
 
     auto start = high_resolution_clock::now();
     for (unsigned int i = 0; i < N_RUNS; ++i) {
-        CPUHistGenerator::generate(-50, 50, dataGen.generate(DATA_SIZE));
+        GPUHistGenerator::generate(-50, 50, dataGen.generate(DATA_SIZE));
     }
     auto end = high_resolution_clock::now();
     std::cout << "time: "
               << duration_cast<milliseconds>(end - start).count()
               << " ms" << std::endl;
     //end timer
-}
+}*/

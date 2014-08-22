@@ -1,19 +1,19 @@
-#ifndef CPU_HIST_GENERATOR_H
-#define CPU_HIST_GENERATOR_H
+#ifndef GPU_HIST_GENERATOR_H
+#define GPU_HIST_GENERATOR_H
 
 #include <vector>
 #include <map>
 
-class CPUHistGenerator {
+class GPUHistGenerator {
 public:
-    ~CPUHistGenerator();
+    ~GPUHistGenerator();
 
     static std::map<int, unsigned int> generate(const int lowerBound,
                                                 const int upperBound,
                                                 const std::vector<int>& data);
 
 private:
-    CPUHistGenerator();
+    GPUHistGenerator();
 };
 
-#endif //CPU_HIST_GENERATOR_H
+#endif //GPU_HIST_GENERATOR_H
