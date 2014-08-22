@@ -6,22 +6,14 @@
 
 class CPUHistGenerator {
 public:
-    CPUHistGenerator(int lowerBound_,
-                     int upperBound_,
-                     const std::vector<int>&& data_);
-
     ~CPUHistGenerator();
 
-    std::map<int, unsigned int> getFrequencies() const;
+    static std::map<int, unsigned int> generate(const int lowerBound,
+                                                      const int upperBound,
+                                                      const std::vector<int>& data);
 
 private:
     CPUHistGenerator();
-
-    const int lowerBound;
-
-    const int upperBound;
-
-    const std::vector<int> data;
 };
 
 #endif //CPU_HIST_GENERATOR_H

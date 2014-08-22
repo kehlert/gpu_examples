@@ -25,10 +25,9 @@ TEST(CPUHistGeneratorTest, CorrectOutput) {
         data.push_back(atoi(line.c_str())); 
     }
 
-    CPUHistGenerator histGen(expectedFrequencies.begin()->first,
-                             expectedFrequencies.rbegin()->first,
-                             std::move(data));
-    auto frequencies = histGen.getFrequencies();
+    auto frequencies = CPUHistGenerator::generate(expectedFrequencies.begin()->first,
+                                                  expectedFrequencies.rbegin()->first,
+                                                  std::move(data));
     ASSERT_EQ(expectedFrequencies, frequencies);
 }
 
@@ -44,7 +43,7 @@ TEST(CPUHistGeneratorTest, Speed) {
 
     auto start = high_resolution_clock::now();
     for (unsigned int i = 0; i < N_RUNS; ++i) {
-        CPUHistGenerator histGen(-50, 50, dataGen.generate(DATA_SIZE));
+        CPUHistGenerator::generate(-50, 50, dataGen.generate(DATA_SIZE));
     }
     auto end = high_resolution_clock::now();
     std::cout << "time: "
