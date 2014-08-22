@@ -9,7 +9,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 include (CTest)
 
 find_package(OpenCL REQUIRED)
-include_directories(${OPENCL_INCLUDE_DIR})
+include_directories(SYSTEM ${OPENCL_INCLUDE_DIR})
 
 #gmock and gtest
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/dependencies/gmock-1.7.0)

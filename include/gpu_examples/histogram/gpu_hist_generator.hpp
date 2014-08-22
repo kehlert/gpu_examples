@@ -3,6 +3,11 @@
 
 #include <vector>
 #include <map>
+#include <assert.h>
+#include <sstream>
+#include <iostream>
+
+#include <CL/cl.hpp>
 
 class GPUHistGenerator {
 public:
@@ -13,6 +18,8 @@ public:
                                                 const std::vector<int>& data);
 
 private:
+    static const char *kernel;
+
     GPUHistGenerator();
 };
 

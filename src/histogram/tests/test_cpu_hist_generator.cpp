@@ -36,5 +36,4 @@ TEST(CPUHistGeneratorTest, Speed) {
     std::cout << "time: "
               << duration_cast<milliseconds>(end - start).count()
               << " ms" << std::endl;
-    //end timer
 }

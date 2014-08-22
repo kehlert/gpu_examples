@@ -84,6 +84,8 @@ flags = [
 'dependencies/gmock-1.7.0/gtest/include',
 '-isystem',
 'dependencies/gmock-1.7.0/include',
+'-isystem',
+os.environ['AMDAPPSDKROOT'] + '/include',
 ]
 
 
