@@ -12,7 +12,7 @@ TEST(GPUHistGeneratorTest, CorrectOutput) {
     std::vector<int> rawData = TestDataReader::readRawData("./data/testData.txt");
     auto frequencies = GPUHistGenerator::generate(expectedFrequencies.begin()->first,
                                                   expectedFrequencies.rbegin()->first,
-                                                  std::move(rawData));
+                                                  rawData);
 //    ASSERT_EQ(expectedFrequencies, frequencies);
     std::cerr << "DISABLED THE ASSERT WITHIN THIS TEST" << std::endl;
 }

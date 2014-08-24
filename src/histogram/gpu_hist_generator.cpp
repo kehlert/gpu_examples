@@ -7,6 +7,12 @@ GPUHistGenerator::~GPUHistGenerator() {}
 std::map<int, unsigned int> GPUHistGenerator::generate(const int lowerBound,
                                                        const int upperBound,
                                                        const std::vector<int>& data) {
+    if(data.size() == 0) {
+        throw std::runtime_error("No data."); 
+    }
+
+    const size_t DATA_SIZE = data.size() * sizeof(data[0]);
+
     cl_int err;
 
     std::vector<cl::Platform> platforms;
@@ -63,16 +69,32 @@ std::map<int, unsigned int> GPUHistGenerator::generate(const int lowerBound,
         throw std::runtime_error("Failed to create the kernel.");
     }
 
-    //copy this to the gpu
-    std::vector<unsigned int> frequencies(upperBound - lowerBound + 1);
+    auto buffer = cl::Buffer(context,
+                             CL_MEM_READ_ONLY,
+                             DATA_SIZE,
+                             nullptr,
+                             &err);
+    if(err != CL_SUCCESS) {
+        throw std::runtime_error("Failed to construct an OpenCL buffer."); 
+    }
 
-    //copy the data back and transform it into a map
+    err = queue.enqueueWriteBuffer(buffer, CL_TRUE, 0, DATA_SIZE, &data[0]);
+    if(err != CL_SUCCESS) {
+        throw std::runtime_error("Failed to write an OpenCL buffer."); 
+    }
+
+    std::vector<int> readData(data.size());
+    err = queue.enqueueReadBuffer(buffer, CL_TRUE, 0, DATA_SIZE, &readData[0]);
+    for(const int val : readData) {
+        std::cout << val << "," << std::flush;
+    }
     std::map<int, unsigned int> frequenciesMap;
     /*
+    std::vector<unsigned int> frequencies(upperBound - lowerBound + 1);
     for (size_t i = 0; i < frequencies.size(); ++i) {
         frequenciesMap[i + lowerBound] = frequencies[i]; 
     }
-*/
+    */
     return frequenciesMap;
 }
 
