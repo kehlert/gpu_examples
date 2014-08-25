@@ -7,20 +7,21 @@
 #include <sstream>
 #include <iostream>
 
-#include <CL/cl.hpp>
+#include <gpu_examples/histogram/gpu.hpp>
 
 class GPUHistGenerator {
 public:
+    GPUHistGenerator();
+
     ~GPUHistGenerator();
 
-    static std::map<int, unsigned int> generate(const int lowerBound,
-                                                const int upperBound,
-                                                const std::vector<int>& data);
+    std::map<int, unsigned int> generate(const int lowerBound,
+                                         const int upperBound,
+                                         const std::vector<int>& data);
 
 private:
-    static const char *kernel;
+    static const char *kernelSrc;
 
-    GPUHistGenerator();
+    GPU gpu;
 };
-
 #endif //GPU_HIST_GENERATOR_H
