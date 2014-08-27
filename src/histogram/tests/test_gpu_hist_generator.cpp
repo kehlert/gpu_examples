@@ -6,7 +6,7 @@
 #include <gpu_examples/histogram/test_data_reader.hpp>
 #include <gpu_examples/histogram/raw_data_generator.hpp> 
 
-TEST(GPUHistGeneratorTest, CorrectOutput) {
+TEST(GPUHistGeneratorTest, DISABLED_CorrectOutput) {
     std::map<int, unsigned int> expectedFrequencies;
     expectedFrequencies = TestDataReader::readFrequencies("./data/testFrequencies.txt");
 

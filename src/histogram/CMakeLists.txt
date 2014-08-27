@@ -13,7 +13,7 @@ add_executable(test_make_histogram ${test_source_files})
 target_link_libraries(test_make_histogram make_histogram_lib gmock gtest gmock_main)
 add_test(test_make_histogram test_make_histogram)
 
-set(cl_files "doNothing.cl" "generateHistogram.cl")
+set(cl_files "doNothing.cl" "generateHistogram.cl" "square.cl")
 
 set(files_to_copy
     "data/testFrequencies.txt"
