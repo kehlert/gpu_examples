@@ -5,12 +5,13 @@
 #include <sstream>
 #include <vector>
 #include <memory>
+#include <fstream>
 
 #include <CL/cl.hpp>
 
 class GPU {
 public:
-    GPU(const char* kernelSrc);
+    GPU(const std::string& kernelPath);
 
     ~GPU();
 
@@ -30,6 +31,22 @@ public:
         queue.enqueueWriteBuffer(*buffer, CL_TRUE, 0, SIZE, &data[0]);
         if(err != CL_SUCCESS) {
             throw std::runtime_error("Failed to write buffer."); 
+        }
+
+        return buffer;
+    }
+
+    template<typename T>
+    std::unique_ptr<cl::Buffer>
+    writeBuffer(size_t nElements, cl_mem_flags flags) {
+        const size_t SIZE = nElements * sizeof(T);
+        cl_int err;
+
+        auto buffer = std::make_unique<cl::Buffer>(
+                          cl::Buffer(context, flags, SIZE, nullptr, &err)
+                      );
+        if(err != CL_SUCCESS) {
+            throw std::runtime_error("Failed to construct buffer."); 
         }
 
         return buffer;

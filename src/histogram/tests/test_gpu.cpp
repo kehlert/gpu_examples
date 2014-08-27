@@ -5,7 +5,7 @@
 
 class GPUTest : public ::testing::Test {
 public:
-    GPUTest() : gpu("__kernel void doNothing() {}") {}
+    GPUTest() : gpu("./doNothing.cl") {}
 
 protected:
     GPU gpu;
@@ -13,6 +13,10 @@ protected:
 
 TEST_F(GPUTest, constructGPU) {
     SUCCEED();    
+}
+
+TEST_F(GPUTest, badKernelPath) {
+    EXPECT_THROW(GPU myGPU("badPath"), std::runtime_error);
 }
 
 TEST_F(GPUTest, writeBuffer) {
@@ -23,6 +27,14 @@ TEST_F(GPUTest, writeBuffer) {
 TEST_F(GPUTest, writeBufferZeroSize) {
     std::vector<int> data(0);
     EXPECT_THROW(gpu.writeBuffer(data, CL_MEM_READ_ONLY), std::runtime_error);
+}
+
+TEST_F(GPUTest, writeEmptyBuffer) {
+    gpu.writeBuffer<int>(10, CL_MEM_READ_ONLY);
+}
+
+TEST_F(GPUTest, writeEmptyBufferZeroSize) {
+    EXPECT_THROW(gpu.writeBuffer<int>(0, CL_MEM_READ_ONLY), std::runtime_error);
 }
 
 TEST_F(GPUTest, readBuffer) {

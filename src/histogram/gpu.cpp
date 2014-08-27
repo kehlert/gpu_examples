@@ -1,6 +1,12 @@
 #include <gpu_examples/histogram/gpu.hpp>
 
-GPU::GPU(const char* kernelSrc) {
+GPU::GPU(const std::string& kernelPath) {
+    std::ifstream kernelFile(kernelPath);
+    if(!kernelFile.is_open()) {
+        throw std::runtime_error("Failed to open the kernel file.");
+    }
+    const char *kernelSrc = "__kernel void doNothing() {}";
+
     cl_int err;
     
     std::vector<cl::Platform> platforms;

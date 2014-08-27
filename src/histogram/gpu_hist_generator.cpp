@@ -1,8 +1,9 @@
 #include <gpu_examples/histogram/gpu_hist_generator.hpp>
 
-const char* GPUHistGenerator::kernelSrc = "__kernel void doNothing() {}";
+GPUHistGenerator::GPUHistGenerator(const std::string& kernelPath)
+: gpu(kernelPath) {}
 
-GPUHistGenerator::GPUHistGenerator() : gpu(kernelSrc) {}
+GPUHistGenerator::GPUHistGenerator() : gpu("") {}
 
 GPUHistGenerator::~GPUHistGenerator() {}
 
@@ -15,19 +16,18 @@ std::map<int, unsigned int> GPUHistGenerator::generate(const int lower,
 
     auto dataBuf = gpu.writeBuffer(data, CL_MEM_READ_ONLY);
     auto stuff = gpu.readBuffer<int>(*dataBuf, data.size());
-/*
-    auto freqBuf = gpu.writeBuffer(upper - lower + 1, CL_MEM_WRITE_ONLY);
-    auto frequencies = gpu.readBuffer<unsigned int>(*freqBuf, frequencies.size());
 
-    for(const int val : frequencies) {
-        std::cout << val << "," << std::flush;
+    size_t freqSize = upper - lower + 1;
+    auto freqBuf = gpu.writeBuffer<unsigned int>(freqSize, CL_MEM_WRITE_ONLY);
+    auto freq = gpu.readBuffer<unsigned int>(*freqBuf, freqSize);
+
+    std::map<int, unsigned int> freqMap;
+    std::cout << "size:" << freq.size() << std::endl;
+    
+    for (size_t i = 0; i < freq.size(); ++i) {
+        freqMap[i + lower] = freq[i]; 
     }
-    for (size_t i = 0; i < frequencies.size(); ++i) {
-        frequenciesMap[i + lower] = frequencies[i]; 
-    }
-    */
-    std::map<int, unsigned int> frequenciesMap;
-    return frequenciesMap;
-   
+    
+    return freqMap;
 }
 

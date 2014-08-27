@@ -11,7 +11,7 @@
 
 class GPUHistGenerator {
 public:
-    GPUHistGenerator();
+    GPUHistGenerator(const std::string& kernelPath);
 
     ~GPUHistGenerator();
 
@@ -19,8 +19,8 @@ public:
                                          const int upperBound,
                                          const std::vector<int>& data);
 
-private:
-    static const char *kernelSrc;
+private: 
+    GPUHistGenerator();
 
     GPU gpu;
 };
