@@ -50,14 +50,12 @@ public:
         return data;
     }
 
-//temporarily public for refactoring purposes
-//private: 
+private:
+    GPU();
+
     cl::Context context;
 
     cl::CommandQueue queue;
-
-private:
-    GPU();
 };
 
 #endif //GPU_H

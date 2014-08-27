@@ -10,10 +10,10 @@ GPU::GPU(const char* kernelSrc) {
     }
 
     context = cl::Context(CL_DEVICE_TYPE_GPU,
-                               nullptr,
-                               nullptr,
-                               nullptr,
-                               &err);
+                          nullptr,
+                          nullptr,
+                          nullptr,
+                          &err);
 
     if(err != CL_SUCCESS) {
         throw std::runtime_error("Failed to create an OpenCL context.");
