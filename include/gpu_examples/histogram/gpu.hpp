@@ -7,7 +7,6 @@
 #include <memory>
 #include <fstream>
 #include <regex>
-#include <iostream>
 
 #include <CL/cl.hpp>
 
@@ -72,9 +71,9 @@ public:
 private:
     GPU();
 
-    std::string getKernelSrc(const std::string& kernelPath) const;
+    static std::string getKernelSrc(const std::string& kernelPath);
 
-    std::string getKernelName(const std::string& src) const;
+    static std::string getKernelName(const std::string& src);
 
     cl::Context context;
 

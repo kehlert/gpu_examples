@@ -34,7 +34,7 @@ GPU::GPU(const std::string& kernelPath) {
         throw std::runtime_error("Failed to create an OpenCL command queue.");
     }
 
-    auto program = cl::Program(context, &kernelSrc[0], false /*build*/, &err);
+    auto program = cl::Program(context, kernelSrc.c_str(), false /*build*/, &err);
     if(err != CL_SUCCESS) {
         throw std::runtime_error("Failed to create an OpenCL program.");
     }
@@ -56,7 +56,7 @@ GPU::GPU(const std::string& kernelPath) {
         throw std::runtime_error(stream.str().c_str());
     }
 
-    auto kernel = cl::Kernel(program, &getKernelName(kernelSrc)[0], &err);
+    auto kernel = cl::Kernel(program, getKernelName(kernelSrc).c_str(), &err);
     if(err != CL_SUCCESS) {
         throw std::runtime_error("Failed to create the kernel.");
     }
@@ -64,7 +64,7 @@ GPU::GPU(const std::string& kernelPath) {
 
 GPU::~GPU() {}
 
-std::string GPU::getKernelSrc(const std::string& kernelPath) const {
+std::string GPU::getKernelSrc(const std::string& kernelPath) {
     std::ifstream kernelFile(kernelPath);
     if(!kernelFile.is_open()) {
         throw std::runtime_error("Failed to open the kernel file.");
@@ -77,7 +77,7 @@ std::string GPU::getKernelSrc(const std::string& kernelPath) const {
     return kernelSrc;
 }
 
-std::string GPU::getKernelName(const std::string& src) const {
+std::string GPU::getKernelName(const std::string& src) {
     static const std::regex nameRegex("kernel void ([[:alpha:]]+)\\(");
     std::smatch match;
     if(!std::regex_search(src, match, nameRegex)) {
