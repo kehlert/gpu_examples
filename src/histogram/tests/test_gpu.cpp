@@ -56,3 +56,13 @@ TEST(GPUTest, runKernel) {
     gpu.runKernel(nWorkers, *buffer, (unsigned int)data.size());
     ASSERT_THAT(gpu.readBuffer<int>(*buffer, data.size()), ElementsAre(1, 4, 9));
 }
+
+TEST(GPUTest, noKernelArgs) {
+    GPU gpu("./doNothing.cl");
+    gpu.runKernel(1);
+}
+
+TEST(GPUTest, tooFewKernelArgs) {
+    GPU gpu("./square.cl");
+    EXPECT_THROW(gpu.runKernel(1), std::runtime_error);
+}

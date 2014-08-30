@@ -1,8 +1,6 @@
 #ifndef GPU_H
 #define GPU_H
 
-#include <iostream>
-
 #include <assert.h>
 
 #include <stdexcept>
@@ -88,6 +86,12 @@ public:
             throw std::runtime_error("Failed to wait for the kernel to finish.");
         }
     }
+    
+#pragma GCC diagnostic push 
+#pragma GCC diagnostic ignored "-Wunused-parameter" 
+    //for when the kernel doesn't take any parameters
+    void setArgs(size_t index) {}
+#pragma GCC diagnostic pop
 
     template<typename T, typename... Args>
     void setArgs(size_t index, T arg, Args... args) {
@@ -98,8 +102,7 @@ public:
 
     template<typename T>
     void setArgs(size_t index, T arg) {
-        if(cl_int err = kernel.setArg(index, arg) != CL_SUCCESS) {
-           std::cout << err << std::endl;
+        if(kernel.setArg(index, arg) != CL_SUCCESS) {
            throw std::runtime_error("Failed to set kernel argument.");
         }
     }
