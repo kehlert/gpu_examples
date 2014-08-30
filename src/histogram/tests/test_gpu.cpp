@@ -1,13 +1,15 @@
-#include <gtest/gtest.h>
+#include<gmock/gmock.h>
 
 #include <gpu_examples/histogram/gpu.hpp>
+
+using ::testing::ElementsAre;
 
 TEST(GPUTest, constructGPU) {
     GPU gpu("./doNothing.cl");
 }
 
 TEST(GPUTest, badKernelPath) {
-    EXPECT_THROW(GPU gpu("badPath"), std::runtime_error);
+    ASSERT_THROW(GPU gpu("badPath"), std::runtime_error);
 }
 
 TEST(GPUTest, writeBuffer) {
@@ -19,7 +21,7 @@ TEST(GPUTest, writeBuffer) {
 TEST(GPUTest, writeBufferZeroSize) {
     GPU gpu("./doNothing.cl");
     std::vector<int> data(0);
-    EXPECT_THROW(gpu.writeBuffer(data, CL_MEM_READ_ONLY), std::runtime_error);
+    ASSERT_THROW(gpu.writeBuffer(data, CL_MEM_READ_ONLY), std::runtime_error);
 }
 
 TEST(GPUTest, writeEmptyBuffer) {
@@ -29,7 +31,7 @@ TEST(GPUTest, writeEmptyBuffer) {
 
 TEST(GPUTest, writeEmptyBufferZeroSize) {
     GPU gpu("./doNothing.cl");
-    EXPECT_THROW(gpu.writeBuffer<int>(0, CL_MEM_READ_ONLY), std::runtime_error);
+    ASSERT_THROW(gpu.writeBuffer<int>(0, CL_MEM_READ_ONLY), std::runtime_error);
 }
 
 TEST(GPUTest, readBuffer) {
@@ -43,10 +45,14 @@ TEST(GPUTest, readBufferZeroSize) {
     GPU gpu("./doNothing.cl");
     std::vector<int> data{1};
     auto buffer = gpu.writeBuffer(data, CL_MEM_READ_ONLY);
-    EXPECT_THROW(gpu.readBuffer<int>(*buffer, 0), std::runtime_error);
+    ASSERT_THROW(gpu.readBuffer<int>(*buffer, 0), std::runtime_error);
 }
 
 TEST(GPUTest, runKernel) {
     GPU gpu("./square.cl");
-    FAIL(); //implement the rest of this test
+    std::vector<int> data{1, 2, 3};
+    auto buffer = gpu.writeBuffer(data, CL_MEM_READ_WRITE);
+    size_t nWorkers = 5; //more than we need
+    gpu.runKernel(nWorkers, *buffer, (unsigned int)data.size());
+    ASSERT_THAT(gpu.readBuffer<int>(*buffer, data.size()), ElementsAre(1, 4, 9));
 }

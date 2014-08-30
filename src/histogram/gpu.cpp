@@ -56,7 +56,7 @@ GPU::GPU(const std::string& kernelPath) {
         throw std::runtime_error(stream.str().c_str());
     }
 
-    auto kernel = cl::Kernel(program, getKernelName(kernelSrc).c_str(), &err);
+    kernel = cl::Kernel(program, getKernelName(kernelSrc).c_str(), &err);
     if(err != CL_SUCCESS) {
         throw std::runtime_error("Failed to create the kernel.");
     }

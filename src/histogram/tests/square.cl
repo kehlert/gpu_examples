@@ -1,4 +1,6 @@
-__kernel void square(__global int *data) {
+__kernel void square(__global int *data, unsigned int size) {
     uint gid = get_global_id(0);
-    data[gid] = data[gid] * data[gid];
+    if(gid < size) {
+        data[gid] = data[gid] * data[gid];
+    }
 }

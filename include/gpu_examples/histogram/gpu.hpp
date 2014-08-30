@@ -1,6 +1,10 @@
 #ifndef GPU_H
 #define GPU_H
 
+#include <iostream>
+
+#include <assert.h>
+
 #include <stdexcept>
 #include <sstream>
 #include <vector>
@@ -68,6 +72,38 @@ public:
         return data;
     }
 
+    template<typename... Args>
+    void runKernel(size_t nWorkItems, Args... args) {
+        setArgs(0, args...);
+        cl_int err = queue.enqueueNDRangeKernel(kernel,
+                                                cl::NullRange,
+                                                cl::NDRange(nWorkItems),
+                                                cl::NullRange);
+        if(err != CL_SUCCESS) {
+            throw std::runtime_error("Failed to queue the kernel.");
+        }
+
+        err = queue.finish();
+        if(err != CL_SUCCESS) {
+            throw std::runtime_error("Failed to wait for the kernel to finish.");
+        }
+    }
+
+    template<typename T, typename... Args>
+    void setArgs(size_t index, T arg, Args... args) {
+        setArgs(index, arg);
+        assert(sizeof...(args) > 0);
+        setArgs(++index, args...);
+    }
+
+    template<typename T>
+    void setArgs(size_t index, T arg) {
+        if(cl_int err = kernel.setArg(index, arg) != CL_SUCCESS) {
+           std::cout << err << std::endl;
+           throw std::runtime_error("Failed to set kernel argument.");
+        }
+    }
+
 private:
     GPU();
 
@@ -78,6 +114,8 @@ private:
     cl::Context context;
 
     cl::CommandQueue queue;
+
+    cl::Kernel kernel;
 };
 
 #endif //GPU_H
