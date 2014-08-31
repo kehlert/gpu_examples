@@ -40,22 +40,6 @@ public:
     }
 
     template<typename T>
-    std::unique_ptr<cl::Buffer>
-    writeBuffer(size_t nElements, cl_mem_flags flags) {
-        const size_t SIZE = nElements * sizeof(T);
-        cl_int err;
-
-        auto buffer = std::make_unique<cl::Buffer>(
-                          cl::Buffer(context, flags, SIZE, nullptr, &err)
-                      );
-        if(err != CL_SUCCESS) {
-            throw std::runtime_error("Failed to construct buffer."); 
-        }
-
-        return buffer;
-    }
-
-    template<typename T>
     std::vector<T>
     readBuffer(const cl::Buffer& buffer, size_t nElements) {
         cl_int err;

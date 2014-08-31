@@ -15,14 +15,22 @@ std::map<int, unsigned int> GPUHistGenerator::generate(const int lower,
     }
 
     auto dataBuf = gpu.writeBuffer(data, CL_MEM_READ_ONLY);
-    auto stuff = gpu.readBuffer<int>(*dataBuf, data.size());
 
     size_t freqSize = upper - lower + 1;
-    auto freqBuf = gpu.writeBuffer<unsigned int>(freqSize, CL_MEM_WRITE_ONLY);
-    auto freq = gpu.readBuffer<unsigned int>(*freqBuf, freqSize);
+    std::vector<unsigned int> freq(freqSize, 0);
+    auto freqBuf = gpu.writeBuffer(freq, CL_MEM_WRITE_ONLY);
+
+    const size_t nWorkItems = 10;
+    gpu.runKernel(nWorkItems,
+                  lower,
+                  upper,
+                  *dataBuf,
+                  (unsigned int)data.size(),
+                  *freqBuf);
+
+    freq = gpu.readBuffer<unsigned int>(*freqBuf, freqSize);
 
     std::map<int, unsigned int> freqMap;
-    std::cout << "size:" << freq.size() << std::endl;
     
     for (size_t i = 0; i < freq.size(); ++i) {
         freqMap[i + lower] = freq[i]; 

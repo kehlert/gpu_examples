@@ -20,18 +20,8 @@ TEST(GPUTest, writeBuffer) {
 
 TEST(GPUTest, writeBufferZeroSize) {
     GPU gpu("./doNothing.cl");
-    std::vector<int> data(0);
+    std::vector<int> data({});
     ASSERT_THROW(gpu.writeBuffer(data, CL_MEM_READ_ONLY), std::runtime_error);
-}
-
-TEST(GPUTest, writeEmptyBuffer) {
-    GPU gpu("./doNothing.cl");
-    gpu.writeBuffer<int>(10, CL_MEM_READ_ONLY);
-}
-
-TEST(GPUTest, writeEmptyBufferZeroSize) {
-    GPU gpu("./doNothing.cl");
-    ASSERT_THROW(gpu.writeBuffer<int>(0, CL_MEM_READ_ONLY), std::runtime_error);
 }
 
 TEST(GPUTest, readBuffer) {
