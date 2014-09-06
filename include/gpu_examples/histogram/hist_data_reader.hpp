@@ -1,11 +1,11 @@
-#ifndef TEST_DATA_READER_H
-#define TEST_DATA_READER_H
+#ifndef HIST_DATA_READER_H
+#define HIST_DATA_READER_H
 
 #include <map>
 #include <vector>
 #include <fstream>
 
-class TestDataReader {
+class HistDataReader {
 public:
     inline static std::map<int, unsigned int> readFrequencies(const std::string& filePath) {
         std::map<int, unsigned int> frequencies;
@@ -38,8 +38,8 @@ public:
     }
 
 private:
-    TestDataReader() {}
+    HistDataReader() {}
 };
 
 
-#endif //TEST_DATA_READER_H
+#endif //HIST_DATA_READER_H

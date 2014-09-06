@@ -18,35 +18,35 @@ public:
 
     ~GPU();
 
+    std::unique_ptr<cl::Buffer> allocateBuffer(size_t size,
+                                               cl_mem_flags flags = 0);
+
     template<typename T>
-    std::unique_ptr<cl::Buffer>
-    writeBuffer(const std::vector<T>& data, cl_mem_flags flags) {
+    std::unique_ptr<cl::Buffer> writeBuffer(const std::vector<T>& data,
+                                            cl_mem_flags flags = 0) {
         const size_t SIZE = data.size() * sizeof(T);
         cl_int err;
+        flags |= CL_MEM_COPY_HOST_PTR | CL_MEM_HOST_READ_ONLY;
 
-        auto buffer = std::make_unique<cl::Buffer>(
-                          cl::Buffer(context, flags, SIZE, nullptr, &err)
+        auto buf = std::make_unique<cl::Buffer>(
+                          cl::Buffer(context, flags, SIZE, (void*)&data[0], &err)
                       );
         if(err != CL_SUCCESS) {
             throw std::runtime_error("Failed to construct buffer."); 
         }
 
-        queue.enqueueWriteBuffer(*buffer, CL_TRUE, 0, SIZE, &data[0]);
-        if(err != CL_SUCCESS) {
-            throw std::runtime_error("Failed to write buffer."); 
-        }
-
-        return buffer;
+        return buf;
     }
 
     template<typename T>
-    std::vector<T>
-    readBuffer(const cl::Buffer& buffer, size_t nElements) {
-        cl_int err;
+    std::vector<T> readBuffer(const cl::Buffer& buf, size_t nElements) {
+        queue.finish();
+
         const size_t SIZE = nElements * sizeof(T);
         std::vector<T> data(nElements);
 
-        err = queue.enqueueReadBuffer(buffer, CL_TRUE, 0, SIZE, &data[0]);
+        cl_int err;
+        err = queue.enqueueReadBuffer(buf, CL_TRUE, 0, SIZE, &data[0]);
         if(err != CL_SUCCESS) {
             throw std::runtime_error("Failed to read buffer."); 
         }
@@ -55,12 +55,12 @@ public:
     }
 
     template<typename... Args>
-    void runKernel(size_t nWorkItems, Args... args) {
+    void runKernel(size_t nWorkItems, size_t workGroupSize, Args... args) {
         setArgs(0, args...);
         cl_int err = queue.enqueueNDRangeKernel(kernel,
                                                 cl::NullRange,
                                                 cl::NDRange(nWorkItems),
-                                                cl::NullRange);
+                                                cl::NDRange(workGroupSize));
         if(err != CL_SUCCESS) {
             throw std::runtime_error("Failed to queue the kernel.");
         }

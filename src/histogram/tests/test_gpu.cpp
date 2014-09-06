@@ -12,6 +12,16 @@ TEST(GPUTest, badKernelPath) {
     ASSERT_THROW(GPU gpu("badPath"), std::runtime_error);
 }
 
+TEST(GPUTest, allocateBuffer) {
+    GPU gpu("./doNothing.cl");
+    size_t size = sizeof(unsigned int) * 10;
+    auto buf = gpu.allocateBuffer(size);
+    EXPECT_NE(buf, nullptr);
+
+    //this shouldn't throw
+    gpu.readBuffer<unsigned int>(*buf, 10);
+}
+
 TEST(GPUTest, writeBuffer) {
     GPU gpu("./doNothing.cl");
     std::vector<int> data{1, 2, 3};
@@ -43,16 +53,16 @@ TEST(GPUTest, runKernel) {
     std::vector<int> data{1, 2, 3};
     auto buffer = gpu.writeBuffer(data, CL_MEM_READ_WRITE);
     size_t nWorkers = 5; //more than we need
-    gpu.runKernel(nWorkers, *buffer, (unsigned int)data.size());
+    gpu.runKernel(nWorkers, nWorkers, *buffer, (unsigned int)data.size());
     ASSERT_THAT(gpu.readBuffer<int>(*buffer, data.size()), ElementsAre(1, 4, 9));
 }
 
 TEST(GPUTest, noKernelArgs) {
     GPU gpu("./doNothing.cl");
-    gpu.runKernel(1);
+    gpu.runKernel(1, 1);
 }
 
 TEST(GPUTest, tooFewKernelArgs) {
     GPU gpu("./square.cl");
-    EXPECT_THROW(gpu.runKernel(1), std::runtime_error);
+    EXPECT_THROW(gpu.runKernel(1, 1), std::runtime_error);
 }

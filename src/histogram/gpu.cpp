@@ -86,4 +86,17 @@ std::string GPU::getKernelName(const std::string& src) {
     return match[1];
 }
 
+std::unique_ptr<cl::Buffer> GPU::allocateBuffer(size_t size,
+                                                cl_mem_flags flags) {
+    cl_int err;
+    auto buf = std::make_unique<cl::Buffer>(
+                      cl::Buffer(context, flags, size, nullptr, &err)
+                  );
+    if(err != CL_SUCCESS) {
+        throw std::runtime_error("Failed to construct buffer."); 
+    }
+
+    return buf;
+}
+
 GPU::GPU() {}

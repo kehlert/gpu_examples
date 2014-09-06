@@ -5,7 +5,6 @@
 #include <map>
 #include <assert.h>
 #include <sstream>
-#include <iostream>
 
 #include <gpu_examples/histogram/gpu.hpp>
 

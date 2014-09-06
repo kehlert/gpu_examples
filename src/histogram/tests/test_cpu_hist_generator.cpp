@@ -3,14 +3,14 @@
 #include <gmock/gmock.h>
 
 #include <gpu_examples/histogram/cpu_hist_generator.hpp> 
-#include <gpu_examples/histogram/test_data_reader.hpp>
+#include <gpu_examples/histogram/hist_data_reader.hpp>
 #include <gpu_examples/histogram/raw_data_generator.hpp> 
 
 TEST(CPUHistGeneratorTest, CorrectOutput) {
     std::map<int, unsigned int> expectedFrequencies;
-    expectedFrequencies = TestDataReader::readFrequencies("./data/testFrequencies.txt");
+    expectedFrequencies = HistDataReader::readFrequencies("./data/testFrequencies.txt");
     
-    std::vector<int> rawData = TestDataReader::readRawData("./data/testData.txt");
+    std::vector<int> rawData = HistDataReader::readRawData("./data/testData.txt");
 
     auto frequencies = CPUHistGenerator::generate(expectedFrequencies.begin()->first,
                                                   expectedFrequencies.rbegin()->first,

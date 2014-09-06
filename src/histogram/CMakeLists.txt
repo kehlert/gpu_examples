@@ -16,6 +16,7 @@ add_test(test_make_histogram test_make_histogram)
 set(test_files_to_copy
     "doNothing.cl"
     "square.cl"
+    "data/simpleData.txt"
     "data/testFrequencies.txt"
     "data/testData.txt")
 
