@@ -1,6 +1,8 @@
 #ifndef GPU_H
 #define GPU_H
 
+#include <iostream>
+
 #include <assert.h>
 
 #include <stdexcept>
@@ -14,6 +16,8 @@
 
 class GPU {
 public:
+    GPU();
+
     GPU(const std::string& kernelPath);
 
     ~GPU();
@@ -55,12 +59,47 @@ public:
     }
 
     template<typename... Args>
-    void runKernel(size_t nWorkItems, size_t workGroupSize, Args... args) {
-        setArgs(0, args...);
-        cl_int err = queue.enqueueNDRangeKernel(kernel,
-                                                cl::NullRange,
-                                                cl::NDRange(nWorkItems),
-                                                cl::NDRange(workGroupSize));
+    void runKernel(const std::string& kernelPath,
+                   size_t nWorkItems,
+                   size_t workGroupSize,
+                   Args... args) {
+        std::string kernelSrc = getKernelSrc(kernelPath);
+        cl_int err;
+
+        auto program = cl::Program(context, kernelSrc.c_str(), false /*build*/, &err);
+        if(err != CL_SUCCESS) {
+            throw std::runtime_error("Failed to create an OpenCL program.");
+        }
+
+        err = program.build({dev});
+        if(err != CL_SUCCESS) {
+            std::string info;
+            err = program.getBuildInfo<std::string>(dev,
+                                                    CL_PROGRAM_BUILD_LOG,
+                                                    &info);
+            std::ostringstream stream;
+            stream << "Failed to build the OpenCL program."
+                   << std::endl << "Build log:" << std::endl;
+            if(err == CL_SUCCESS) {
+                stream << info;
+            } else {
+                stream << "Failed to get the build log.";
+            }
+            throw std::runtime_error(stream.str().c_str());
+        }
+
+        cl::Kernel kernel(program, getKernelName(kernelSrc).c_str(), &err);
+
+        if(err != CL_SUCCESS) {
+            throw std::runtime_error("Failed to create the kernel.");
+        }
+
+        setArgs(&kernel, 0, args...);
+
+        err = queue.enqueueNDRangeKernel(kernel,
+                                         cl::NullRange,
+                                         cl::NDRange(nWorkItems),
+                                         cl::NDRange(workGroupSize));
         if(err != CL_SUCCESS) {
             throw std::runtime_error("Failed to queue the kernel.");
         }
@@ -74,35 +113,40 @@ public:
 #pragma GCC diagnostic push 
 #pragma GCC diagnostic ignored "-Wunused-parameter" 
     //for when the kernel doesn't take any parameters
-    void setArgs(size_t index) {}
+    void setArgs(cl::Kernel *kernel, size_t index) {}
 #pragma GCC diagnostic pop
 
     template<typename T, typename... Args>
-    void setArgs(size_t index, T arg, Args... args) {
-        setArgs(index, arg);
+    void setArgs(cl::Kernel *kernel, size_t index, T arg, Args... args) {
+        setArgs(kernel, index, arg);
         assert(sizeof...(args) > 0);
-        setArgs(++index, args...);
+        setArgs(kernel, ++index, args...);
     }
 
     template<typename T>
-    void setArgs(size_t index, T arg) {
-        if(kernel.setArg(index, arg) != CL_SUCCESS) {
-           throw std::runtime_error("Failed to set kernel argument.");
+    void setArgs(cl::Kernel *kernel, size_t index, T arg) {
+        if(kernel->setArg(index, arg) != CL_SUCCESS) {
+           std::string kernelName;
+           kernel->getInfo(CL_KERNEL_FUNCTION_NAME, &kernelName);
+          
+           std::ostringstream stream;
+           stream << "Failed to set kernel argument."
+                  << " Kernel: " << kernelName 
+                  << " Arg index: " << index;
+           throw std::runtime_error(stream.str().c_str());
         }
     }
 
 private:
-    GPU();
-
     static std::string getKernelSrc(const std::string& kernelPath);
 
     static std::string getKernelName(const std::string& src);
 
     cl::Context context;
 
-    cl::CommandQueue queue;
+    cl::Device dev;
 
-    cl::Kernel kernel;
+    cl::CommandQueue queue;
 };
 
 #endif //GPU_H

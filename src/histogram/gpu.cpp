@@ -1,8 +1,6 @@
 #include <gpu_examples/histogram/gpu.hpp>
 
-GPU::GPU(const std::string& kernelPath) {
-    std::string kernelSrc = getKernelSrc(kernelPath);
-
+GPU::GPU() {
     cl_int err;
     
     std::vector<cl::Platform> platforms;
@@ -24,41 +22,16 @@ GPU::GPU(const std::string& kernelPath) {
     std::vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
 
     if(devices.size() == 0) {
-        throw std::runtime_error("Did not find an OpenCL device.");
+        throw std::runtime_error("Did not find an OpenCL GPU device.");
     } else if(devices.size() > 1) {
-        throw std::runtime_error("Expected only one OpenCL device.");
+        throw std::runtime_error("Expected only one OpenCL GPU device.");
     }
+
+    dev = devices[0];
 
     queue = cl::CommandQueue(context, devices[0], 0 /*properties*/, &err);
     if(err != CL_SUCCESS) {
         throw std::runtime_error("Failed to create an OpenCL command queue.");
-    }
-
-    auto program = cl::Program(context, kernelSrc.c_str(), false /*build*/, &err);
-    if(err != CL_SUCCESS) {
-        throw std::runtime_error("Failed to create an OpenCL program.");
-    }
-
-    err = program.build(devices);
-    if(err != CL_SUCCESS) {
-        std::string info;
-        err = program.getBuildInfo<std::string>(devices[0],
-                                                CL_PROGRAM_BUILD_LOG,
-                                                &info);
-        std::ostringstream stream;
-        stream << "Failed to build the OpenCL program."
-               << std::endl << "Build log:" << std::endl;
-        if(err == CL_SUCCESS) {
-            stream << info;
-        } else {
-            stream << "Failed to get the build log.";
-        }
-        throw std::runtime_error(stream.str().c_str());
-    }
-
-    kernel = cl::Kernel(program, getKernelName(kernelSrc).c_str(), &err);
-    if(err != CL_SUCCESS) {
-        throw std::runtime_error("Failed to create the kernel.");
     }
 }
 
@@ -93,10 +66,9 @@ std::unique_ptr<cl::Buffer> GPU::allocateBuffer(size_t size,
                       cl::Buffer(context, flags, size, nullptr, &err)
                   );
     if(err != CL_SUCCESS) {
+        std::cout << "err:" << err << std::endl;
         throw std::runtime_error("Failed to construct buffer."); 
     }
 
     return buf;
 }
-
-GPU::GPU() {}

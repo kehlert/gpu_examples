@@ -12,11 +12,11 @@ TEST(GPUHistGeneratorTest, CorrectOutput) {
 
     std::vector<int> rawData = HistDataReader::readRawData("./data/testData.txt");
     
-    GPUHistGenerator gen("./generateHistogram.cl");
+    GPUHistGenerator gen;
     auto hist = gen.generate(expectedHist.begin()->first,
                              expectedHist.rbegin()->first,
                              rawData);
-    ASSERT_EQ(expectedHist, hist);
+    ASSERT_THAT(hist, ::testing::ContainerEq(expectedHist));
 }
 
 TEST(GPUHistGeneratorTest, Speed) {
@@ -28,7 +28,7 @@ TEST(GPUHistGeneratorTest, Speed) {
     const size_t DATA_SIZE = 10000;
 
     RawDataGenerator dataGen(LOWER_BOUND, UPPER_BOUND);
-    auto histGen = GPUHistGenerator("./generateHistogram.cl");
+    GPUHistGenerator histGen;
 
     auto start = high_resolution_clock::now();
     for (unsigned int i = 0; i < N_RUNS; ++i) {

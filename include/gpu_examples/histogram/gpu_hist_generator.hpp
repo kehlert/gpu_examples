@@ -10,7 +10,7 @@
 
 class GPUHistGenerator {
 public:
-    GPUHistGenerator(const std::string& kernelPath);
+    GPUHistGenerator();
 
     ~GPUHistGenerator();
 
@@ -19,8 +19,6 @@ public:
                                          const std::vector<int>& data);
 
 private: 
-    GPUHistGenerator();
-
     GPU gpu;
 };
 #endif //GPU_HIST_GENERATOR_H

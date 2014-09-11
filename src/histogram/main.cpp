@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
     }
     std::vector<int> data = HistDataReader::readRawData(argv[1]);
 
-    GPUHistGenerator gen("./generateHistogram.cl");
+    GPUHistGenerator gen;
     auto minMax = std::minmax_element(data.begin(), data.end());
     auto hist = gen.generate(*minMax.first, *minMax.second, data); 
     //auto hist = CPUHistGenerator::generate(*minMax.first, *minMax.second, data); 

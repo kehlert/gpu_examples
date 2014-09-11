@@ -20,7 +20,7 @@ set(test_files_to_copy
     "data/testFrequencies.txt"
     "data/testData.txt")
 
-set(cl_files "generateHistogram.cl")
+set(cl_files "generateSubHists.cl" "reduceSubHists.cl")
 
 add_custom_target(copy)
 foreach(f ${test_files_to_copy})
