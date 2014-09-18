@@ -1,6 +1,9 @@
 #include <gpu_examples/histogram/gpu_hist_generator.hpp>
 
-GPUHistGenerator::GPUHistGenerator() {}
+GPUHistGenerator::GPUHistGenerator() {
+    gpu.buildKernel("generateSubHists", "./generateSubHists.cl");
+    gpu.buildKernel("reduceSubHists", "./reduceSubHists.cl");
+}
 
 GPUHistGenerator::~GPUHistGenerator() {}
 
@@ -20,7 +23,7 @@ std::map<int, unsigned int> GPUHistGenerator::generate(const int lower,
 
     size_t subHistsSize = sizeof(unsigned int) * histSize * workGroupSize;
     auto subHists = gpu.allocateBuffer(subHistsSize, CL_MEM_WRITE_ONLY);
-    gpu.runKernel("./generateSubHists.cl",
+    gpu.runKernel("generateSubHists",
                   nWorkItems,
                   workGroupSize,
                   lower,
@@ -34,7 +37,7 @@ std::map<int, unsigned int> GPUHistGenerator::generate(const int lower,
     std::vector<unsigned int> zeros(histSize, 0);
     auto histBuf = gpu.writeBuffer(zeros, CL_MEM_WRITE_ONLY);
 
-    gpu.runKernel("./reduceSubHists.cl",
+    gpu.runKernel("reduceSubHists",
                   histSize,
                   workGroupSize,
                   *histBuf,

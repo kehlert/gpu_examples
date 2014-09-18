@@ -1,8 +1,6 @@
 #ifndef GPU_H
 #define GPU_H
 
-#include <iostream>
-
 #include <assert.h>
 
 #include <stdexcept>
@@ -10,7 +8,8 @@
 #include <vector>
 #include <memory>
 #include <fstream>
-#include <regex>
+#include <algorithm>
+#include <unordered_map>
 
 #include <CL/cl.hpp>
 
@@ -21,6 +20,8 @@ public:
     GPU(const std::string& kernelPath);
 
     ~GPU();
+
+    void buildKernel(const std::string& name, const std::string& path);
 
     std::unique_ptr<cl::Buffer> allocateBuffer(size_t size,
                                                cl_mem_flags flags = 0);
@@ -59,44 +60,14 @@ public:
     }
 
     template<typename... Args>
-    void runKernel(const std::string& kernelPath,
+    void runKernel(const std::string& kernelName,
                    size_t nWorkItems,
                    size_t workGroupSize,
                    Args... args) {
-        std::string kernelSrc = getKernelSrc(kernelPath);
         cl_int err;
+        setArgs(&kernels[kernelName], 0, args...);
 
-        auto program = cl::Program(context, kernelSrc.c_str(), false /*build*/, &err);
-        if(err != CL_SUCCESS) {
-            throw std::runtime_error("Failed to create an OpenCL program.");
-        }
-
-        err = program.build({dev});
-        if(err != CL_SUCCESS) {
-            std::string info;
-            err = program.getBuildInfo<std::string>(dev,
-                                                    CL_PROGRAM_BUILD_LOG,
-                                                    &info);
-            std::ostringstream stream;
-            stream << "Failed to build the OpenCL program."
-                   << std::endl << "Build log:" << std::endl;
-            if(err == CL_SUCCESS) {
-                stream << info;
-            } else {
-                stream << "Failed to get the build log.";
-            }
-            throw std::runtime_error(stream.str().c_str());
-        }
-
-        cl::Kernel kernel(program, getKernelName(kernelSrc).c_str(), &err);
-
-        if(err != CL_SUCCESS) {
-            throw std::runtime_error("Failed to create the kernel.");
-        }
-
-        setArgs(&kernel, 0, args...);
-
-        err = queue.enqueueNDRangeKernel(kernel,
+        err = queue.enqueueNDRangeKernel(kernels[kernelName],
                                          cl::NullRange,
                                          cl::NDRange(nWorkItems),
                                          cl::NDRange(workGroupSize));
@@ -147,6 +118,8 @@ private:
     cl::Device dev;
 
     cl::CommandQueue queue;
+
+    std::unordered_map<std::string, cl::Kernel> kernels;
 };
 
 #endif //GPU_H

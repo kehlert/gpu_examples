@@ -1,4 +1,4 @@
-__kernel void generateHistogram(const uint lower,
+__kernel void generateSubHists(const uint lower,
                                 const uint upper,
                                 __global int *data,
                                 uint dataSize,

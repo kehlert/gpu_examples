@@ -37,6 +37,47 @@ GPU::GPU() {
 
 GPU::~GPU() {}
 
+void GPU::buildKernel(const std::string& name, const std::string& path) {
+    cl_int err;
+    std::string kernelSrc = getKernelSrc(path);
+
+    auto program = cl::Program(context, kernelSrc.c_str(), false /*build*/, &err);
+    if(err != CL_SUCCESS) {
+        std::ostringstream stream;
+        stream << "Failed to create an OpenCL program for the kernel " << name;
+        throw std::runtime_error(stream.str().c_str());
+    }
+
+    err = program.build({dev});
+    if(err != CL_SUCCESS) {
+        std::string info;
+        err = program.getBuildInfo<std::string>(dev,
+                                                CL_PROGRAM_BUILD_LOG,
+                                                &info);
+        std::ostringstream stream;
+        stream << "Failed to build the OpenCL program."
+               << std::endl << "Build log:" << std::endl;
+        if(err == CL_SUCCESS) {
+            stream << info;
+        } else {
+            stream << "Failed to get the build log.";
+        }
+        throw std::runtime_error(stream.str().c_str());
+    }
+
+    if (!kernels.emplace(name, cl::Kernel(program, name.c_str(), &err)).second) {
+        std::ostringstream stream;
+        stream << "Kernel name " << name << " was not unique.";
+        throw std::runtime_error(stream.str().c_str());
+    };
+
+    if(err != CL_SUCCESS) {
+        std::ostringstream stream;
+        stream << "Failed to create the kernel " << name << ".";
+        throw std::runtime_error(stream.str().c_str());
+    }
+}
+
 std::string GPU::getKernelSrc(const std::string& kernelPath) {
     std::ifstream kernelFile(kernelPath);
     if(!kernelFile.is_open()) {
@@ -50,15 +91,6 @@ std::string GPU::getKernelSrc(const std::string& kernelPath) {
     return kernelSrc;
 }
 
-std::string GPU::getKernelName(const std::string& src) {
-    static const std::regex nameRegex("kernel void ([[:alpha:]]+)\\(");
-    std::smatch match;
-    if(!std::regex_search(src, match, nameRegex)) {
-        throw std::runtime_error("Couldn't find the kernel name in the .cl file.");
-    }
-    return match[1];
-}
-
 std::unique_ptr<cl::Buffer> GPU::allocateBuffer(size_t size,
                                                 cl_mem_flags flags) {
     cl_int err;
@@ -66,7 +98,6 @@ std::unique_ptr<cl::Buffer> GPU::allocateBuffer(size_t size,
                       cl::Buffer(context, flags, size, nullptr, &err)
                   );
     if(err != CL_SUCCESS) {
-        std::cout << "err:" << err << std::endl;
         throw std::runtime_error("Failed to construct buffer."); 
     }
 

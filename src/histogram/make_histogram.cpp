@@ -10,7 +10,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-
     std::vector<int> data = HistDataReader::readRawData(argv[1]);
     auto minMax = std::minmax_element(data.begin(), data.end());
 
