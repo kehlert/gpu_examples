@@ -1,8 +1,8 @@
 #ifndef RAW_DATA_GENERATOR_H
 #define RAW_DATA_GENERATOR_H
 
+#include <stdexcept>
 #include <random>
-#include <assert.h>
 
 class RawDataGenerator {
 public:

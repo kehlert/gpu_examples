@@ -5,7 +5,10 @@ RawDataGenerator::RawDataGenerator()
 
 RawDataGenerator::RawDataGenerator(int lowerBound, int upperBound)
 : engine(SEED), dist(lowerBound, upperBound) {
-    assert(lowerBound <= upperBound);
+    if(lowerBound >= upperBound) {
+        throw std::runtime_error("Histogram data lower bound must be lower "
+                                 "than the upper bound.");
+    };
 }
 
 RawDataGenerator::~RawDataGenerator() {}

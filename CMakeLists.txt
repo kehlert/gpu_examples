@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 2.8.12)
 
 project(gpu_examples)
 
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    message(FATAL_ERROR "Only GCC is supported.")
+endif()
+
 set(CMAKE_CXX_FLAGS "-std=c++1y -Wall -Wextra -Wpedantic")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")

@@ -14,7 +14,7 @@ TEST(RawDataGeneratorTest, CorrectDataSize) {
 }
 
 TEST(RawDataGeneratorDeathTest, badLimits) {
-    ASSERT_DEATH(RawDataGenerator gen(1, 0), "<");
+    ASSERT_THROW(RawDataGenerator gen(1, 0), std::runtime_error);
 }
 
 TEST(RawDataGeneratorTest, WithinLimits) {
